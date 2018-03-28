@@ -1,0 +1,14 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# IDE - VSCode
+.vscode/*
+*/.vscode/*
+
+# node_modules
+/www/node_modules/*
+
+# game build output
+/www/game.js
+
+# go debug
+debug

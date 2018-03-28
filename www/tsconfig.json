@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "outFile": "game.js"
+  }, "files": [
+    "ts/app.ts"
+  ]
+}
