@@ -29,8 +29,8 @@ export class PlayerController {
         this.gun.anchor.x = 0.5;
         this.gun.anchor.y = 0.5;
 
-        this.container.x = 400;
-        this.container.y = 400;
+        this.container.x = this.game.width / 2;
+        this.container.y = this.game.height / 2;;
 
         this.game.app.stage.addChild(this.container);
         this.input.create();

@@ -15,6 +15,7 @@ export class InputController {
     pointer: PIXI.Sprite; 
     shotCooldown = 10;   
     shotCooldownCrtl = 0;
+    diagonalSpeedFactor = 1 / 1.414213;
 
     create() {
         window.addEventListener('keydown', evt => {
@@ -39,8 +40,8 @@ export class InputController {
         this.pointer.x = -10;
         this.pointer.y = -10;
 
-        this.pointer.width = 10;
-        this.pointer.height = 10;
+        this.pointer.width = this.player.game.width / 150;
+        this.pointer.height = this.pointer.width;
 
         this.pointer.anchor.x = 0.5;
         this.pointer.anchor.y = 0.5;
@@ -50,23 +51,26 @@ export class InputController {
     }
 
     update(delta: number) {
-        if(this.keys.up && this.player.container.y > this.player.container.height/2){
-            this.player.container.y -= this.player.speed * delta;
+        let s = this.player.speed * delta;
+        if(this.keys.up && this.player.container.y > this.player.container.height/2){            
+            if(this.keys.left || this.keys.right) s *= this.diagonalSpeedFactor;
+            this.player.container.y -= s;
         }else{
             this.keys.up = false;
         }
         if(this.keys.down && this.player.container.y < this.player.game.height - this.player.container.height/2){
-            this.player.container.y += this.player.speed * delta;
+            if(this.keys.left || this.keys.right) s *= this.diagonalSpeedFactor;
+            this.player.container.y += s;
         }else{
             this.keys.down = false;
         }
         if(this.keys.left && this.player.container.x > this.player.container.width/2){
-            this.player.container.x -= this.player.speed * delta;
+            this.player.container.x -= s;
         }else{
             this.keys.left = false;
         }
         if(this.keys.right && this.player.container.x < this.player.game.width - this.player.container.width/2){
-            this.player.container.x += this.player.speed * delta;
+            this.player.container.x += s;
         }else{
             this.keys.right = false;
         }
@@ -87,7 +91,7 @@ export class InputController {
         this.gunTrack(mouseposition);
         if(this.keys.mousedown && this.shotCooldownCrtl <= 0){
             this.shotCooldownCrtl = this.shotCooldown;
-            this.player.game.level.shot(this.player.container.x, this.player.container.y, this.player.gun.rotation)
+            this.player.game.field.shot(this.player.container.x, this.player.container.y, this.player.gun.rotation)
         }
         this.shotCooldownCrtl -= delta;
     }

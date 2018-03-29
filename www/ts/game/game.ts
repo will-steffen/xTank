@@ -1,11 +1,11 @@
-import { LevelController } from './controllers/level/controller';
+import { FieldController } from './controllers/field/controller';
 import { PlayerController } from './controllers/player/controller';
 import { AssetElement } from './model/base';
 import { Assets } from './def/assets';
 
 export class Game {    
     app: PIXI.Application;
-    level: LevelController;
+    field: FieldController;
     player: PlayerController;
     height: number;
     width: number;
@@ -13,8 +13,8 @@ export class Game {
     assets: Assets;  
 
     constructor() { 
-        this.app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
-        this.level = new LevelController(this);
+        this.app = new PIXI.Application({ width: 900, height: 600 });
+        this.field = new FieldController(this);
         this.player = new PlayerController(this);
         this.height = this.app.view.height;
         this.width = this.app.view.width;
@@ -40,14 +40,14 @@ export class Game {
     }
   
     create() {
-        this.level.create();
+        this.field.create();
         this.player.create();
         this.app.ticker.add(delta => this.update(delta));
         //this.addFPS();
     }
 
     update(delta) {
-        this.level.update(delta);
+        this.field.update(delta);
         this.player.update(delta);
     }
 
