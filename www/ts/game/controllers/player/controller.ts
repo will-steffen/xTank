@@ -3,7 +3,7 @@ import { InputController } from './input';
 
 export class PlayerController {
     container = new PIXI.Container();
-    canhao: PIXI.Sprite;
+    gun: PIXI.Sprite;
     tank: PIXI.Sprite;
     speed = 3;
 
@@ -11,14 +11,14 @@ export class PlayerController {
 
     constructor(public game: Game) {
         this.input = new InputController(this);
-    }  
+    }
 
     create() {
-        this.canhao = new PIXI.Sprite(PIXI.loader.resources[this.game.assets.canhao.path].texture);
+        this.gun = new PIXI.Sprite(PIXI.loader.resources[this.game.assets.gun.path].texture);
         this.tank = new PIXI.Sprite(PIXI.loader.resources[this.game.assets.tank.path].texture);
 
         this.container.addChild(this.tank);
-        this.container.addChild(this.canhao);
+        this.container.addChild(this.gun);
         this.container.width = this.game.assets.tankSize * this.game.width;
         this.container.height = this.container.width;
         this.container.pivot.y = 0.5;
@@ -26,8 +26,8 @@ export class PlayerController {
         this.tank.anchor.y = 0.5;
         this.tank.anchor.x = 0.5;
 
-        this.canhao.anchor.x = 0.5;
-        this.canhao.anchor.y = 0.5;
+        this.gun.anchor.x = 0.5;
+        this.gun.anchor.y = 0.5;
 
         this.container.x = 400;
         this.container.y = 400;

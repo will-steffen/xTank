@@ -25,10 +25,11 @@ export class Game {
 
     load() {
         let toLoad: AssetElement[] = [
-            this.assets.canhao, 
+            this.assets.gun, 
             this.assets.tank,
-            this.assets.pointer 
-        ]; 
+            this.assets.pointer,
+            this.assets.bullet
+        ];
      
         let paths: string[] = toLoad.map(i => { return i.path });
    
@@ -60,7 +61,7 @@ export class Game {
         fps.style.top = '0';
         fps.style.fontSize = '30px';
         document.body.appendChild(fps);         
-        this.app.ticker.add(delta => {            
+        this.app.ticker.add(delta => {
             let fp = Math.round(60 / delta);
             if(fp < mFps) {
                 mFps = fp;
