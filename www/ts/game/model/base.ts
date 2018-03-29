@@ -1,8 +1,7 @@
-export class WorldElement {
+export class AssetElement {
     constructor(
         public path: string,
         public width: number,
-        public height: number,
-        public relativeSpeed?: number
+        public height: number
     ) {}
 }

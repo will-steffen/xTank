@@ -1,21 +1,16 @@
 {
-  "name": "pixits",
+  "name": "x-tank",
   "version": "1.0.0",
-  "description": "teste com pixi usando typescript",
+  "description": "=]",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc-bundle --project ./tsconfig.json",
-    "start": "run-when-changed --watch \"**\\*.ts\" --exec \"npm run build\"",
-    "serve": "http-server -c-1",
-    "publish": "mkdir www && npm run build && copy index.html www && copy game.js www && copy pixi.min.js www && mkdir www/assets && xcopy assets www/assets /a /s /y"
+    "build": "tsc-bundle --project ./tsconfig.json"  
   },
-  "author": "ws",
+  "author": "willian steffen",
   "license": "ISC",
   "devDependencies": {
     "@types/pixi.js": "^4.7.2",
-    "http-server": "^0.11.1",
-    "run-when-changed": "^2.0.3",
     "typescript": "^2.7.2",
     "typescript-bundle": "^0.8.9"
   }

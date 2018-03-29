@@ -1,6 +1,7 @@
 import { LevelController } from './controllers/level/controller';
 import { PlayerController } from './controllers/player/controller';
-import { WorldElement } from './model/base';
+import { AssetElement } from './model/base';
+import { Assets } from './def/assets';
 
 export class Game {    
     app: PIXI.Application;
@@ -8,7 +9,8 @@ export class Game {
     player: PlayerController;
     height: number;
     width: number;
-  
+
+    assets: Assets;  
 
     constructor() { 
         this.app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
@@ -16,12 +18,17 @@ export class Game {
         this.player = new PlayerController(this);
         this.height = this.app.view.height;
         this.width = this.app.view.width;
-        document.body.appendChild(this.app.view);     
+        document.body.appendChild(this.app.view);
+        this.assets = new Assets();     
         this.load();
     }
 
     load() {
-        let toLoad: WorldElement[] = [];  
+        let toLoad: AssetElement[] = [
+            this.assets.canhao, 
+            this.assets.tank,
+            this.assets.pointer 
+        ]; 
      
         let paths: string[] = toLoad.map(i => { return i.path });
    
@@ -35,7 +42,7 @@ export class Game {
         this.level.create();
         this.player.create();
         this.app.ticker.add(delta => this.update(delta));
-        this.addFPS();
+        //this.addFPS();
     }
 
     update(delta) {
