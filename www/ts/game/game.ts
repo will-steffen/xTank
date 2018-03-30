@@ -15,17 +15,17 @@ export class Game {
     assets: Assets;  
 
     constructor() { 
+        this.assets = new Assets();
         this.loadConfig().then(() => {
             this.app = new PIXI.Application({ width: this.config.width, height: this.config.height });
             this.field = new FieldController(this);
             this.player = new PlayerController(this);
             this.height = this.app.view.height;
             this.width = this.app.view.width;
-            this.app.view.style.marginTop = 'calc(50vh - '+(this.config.height/2)+'px)';
-            document.body.appendChild(this.app.view);
-            this.assets = new Assets();     
+            this.app.view.style.marginTop = 'calc(50vh - ' + (this.config.height/2) + 'px)';
+            document.body.appendChild(this.app.view);                 
             this.load();
-        });        
+        });   
     }
 
     load() {
@@ -77,13 +77,13 @@ export class Game {
     }
     
     private loadConfig(): Promise<void> {
+        // TS error with "new Promise()" =[
         return new window['Promise']((resolve, reject) => {
             
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = () => {
                 if (xmlhttp.readyState == XMLHttpRequest.DONE) { 
-                   if (xmlhttp.status == 200) {
-                       console.log();
+                   if (xmlhttp.status == 200) {                     
                        this.config = new Config().fromServer(xmlhttp.responseText);
                        resolve();
                    }             
@@ -92,10 +92,8 @@ export class Game {
                    }
                 }
             };        
-            xmlhttp.open("GET", "config.json", true);
+            xmlhttp.open("GET", this.assets.configPath, true);
             xmlhttp.send();
-
-            
         });
     }
 }

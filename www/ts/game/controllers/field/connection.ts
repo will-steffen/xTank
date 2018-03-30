@@ -30,7 +30,7 @@ export class ConnectionController {
             this.serverId = received.id;
         }else{
             console.log(received.bullet);
-            this.field.renderShot(received.bullet.x, received.bullet.y);
+            this.field.renderer.shot(received.bullet.x, received.bullet.y);
         }
     }
 

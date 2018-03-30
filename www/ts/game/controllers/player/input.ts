@@ -91,14 +91,18 @@ export class InputController {
         this.gunTrack(mouseposition);
         if(this.keys.mousedown && this.shotCooldownCrtl <= 0){
             this.shotCooldownCrtl = this.shotCooldown;
-            this.player.game.field.shot(this.player.container.x, this.player.container.y, this.player.gun.rotation)
+            let distance = this.player.game.config.tankSize * 1.1 / 2
+            let rot = this.player.gun.rotation;
+            let x = this.player.container.x + Math.sin(rot) * distance;
+            let y = this.player.container.y - Math.cos(rot) * distance;;
+            this.player.game.field.shot(x, y, rot)
         }
         this.shotCooldownCrtl -= delta;
     }
 
     gunTrack(pos) {
         let dx = pos.x - this.player.container.x;
-        let dy = pos.y - this.player.container.y; 
+        let dy = pos.y - this.player.container.y;
         let d =  dx >= 0 ? 1 : -1;  
         this.player.gun.rotation = Math.atan(dy/dx) + (Math.PI * d / 2);      
     }

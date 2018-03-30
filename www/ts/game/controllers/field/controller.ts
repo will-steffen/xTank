@@ -1,12 +1,13 @@
 import { Game } from '../../game';
+import { RendererController } from './renderer';
 import { ConnectionController } from './connection';
 
-export class FieldController {
-    bullets: PIXI.Sprite[] = [];
-    bulletsPool: PIXI.Sprite[] = [];
+export class FieldController {    
+    renderer: RendererController;
     connection: ConnectionController;
 
-    constructor(private game: Game) {
+    constructor(public game: Game) {
+        this.renderer = new RendererController(this);
         this.connection = new ConnectionController(this);
     }
 
@@ -19,27 +20,8 @@ export class FieldController {
     }
 
     shot(x, y, angleTarget){
-        this.renderShot(x, y);
         this.connection.sendBullet(x, y);
     }
-
-    renderShot(x, y) {
-        let b = new PIXI.Sprite(PIXI.loader.resources[this.game.assets.bullet.path].texture);
-        b.x = x;
-        b.y = y;
-        // b['target'] = angleTarget;
-        this.game.app.stage.addChild(b);
-    }
-
-    getBullet() {
-        let bullet: PIXI.Sprite;
-        if(this.bulletsPool.length > 0){
-            bullet = this.bulletsPool[0];
-            this.bulletsPool.splice(0, 1);
-        }else{
-            bullet = new PIXI.Sprite(PIXI.loader.resources[this.game.assets.bullet.path].texture);
-        }
-        return bullet;
-    }
+    
 
 }
