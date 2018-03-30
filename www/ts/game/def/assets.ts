@@ -7,6 +7,4 @@ export class Assets {
     tank = new AssetElement(folder + 'base.png', 177, 177);
     pointer = new AssetElement(folder + 'pointer.png', 2, 2);
     bullet = new AssetElement(folder + 'bullet.png', 2, 2);
-
-    tankSize = 0.065;
 }

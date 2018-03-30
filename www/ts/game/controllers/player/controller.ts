@@ -4,9 +4,7 @@ import { InputController } from './input';
 export class PlayerController {
     container = new PIXI.Container();
     gun: PIXI.Sprite;
-    tank: PIXI.Sprite;
-    speed = 3;
-
+    tank: PIXI.Sprite;  
     private input: InputController;
 
     constructor(public game: Game) {
@@ -19,7 +17,7 @@ export class PlayerController {
 
         this.container.addChild(this.tank);
         this.container.addChild(this.gun);
-        this.container.width = this.game.assets.tankSize * this.game.width;
+        this.container.width = this.game.config.tankSize;
         this.container.height = this.container.width;
         this.container.pivot.y = 0.5;
         this.container.pivot.x = 0.5;

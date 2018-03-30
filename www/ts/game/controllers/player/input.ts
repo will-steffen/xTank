@@ -51,7 +51,7 @@ export class InputController {
     }
 
     update(delta: number) {
-        let s = this.player.speed * delta;
+        let s = this.player.game.config.tankSpeed * delta;
         if(this.keys.up && this.player.container.y > this.player.container.height/2){            
             if(this.keys.left || this.keys.right) s *= this.diagonalSpeedFactor;
             this.player.container.y -= s;

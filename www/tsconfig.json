@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "module": "amd",
-    "outFile": "game.js"
+    "outFile": "game.js",
+    "target": "es2015"
   }, "files": [
     "ts/app.ts"
   ]
