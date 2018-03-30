@@ -1,4 +1,5 @@
 export enum BroadcastType {
     Open   = 1,
-    Update = 2
+    Update = 2,
+    Bullet = 3
 }

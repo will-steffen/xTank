@@ -16,12 +16,12 @@ export class FieldController {
     }
 
     update(delta: number) {
-
+        this.connection.sendPlayerState(
+            this.game.player.tank.container.x,
+            this.game.player.tank.container.y,
+            this.game.player.tank.base.rotation,
+            this.game.player.tank.gun.rotation,
+        );
+        this.renderer.update(delta);
     }
-
-    shot(x, y, angleTarget){
-        this.connection.sendBullet(x, y);
-    }
-    
-
 }

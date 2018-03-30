@@ -52,37 +52,37 @@ export class InputController {
 
     update(delta: number) {
         let s = this.player.game.config.tankSpeed * delta;
-        if(this.keys.up && this.player.container.y > this.player.container.height/2){            
+        if(this.keys.up && this.player.tank.container.y > this.player.tank.container.height/2){            
             if(this.keys.left || this.keys.right) s *= this.diagonalSpeedFactor;
-            this.player.container.y -= s;
+            this.player.tank.container.y -= s;
         }else{
             this.keys.up = false;
         }
-        if(this.keys.down && this.player.container.y < this.player.game.height - this.player.container.height/2){
+        if(this.keys.down && this.player.tank.container.y < this.player.game.height - this.player.tank.container.height/2){
             if(this.keys.left || this.keys.right) s *= this.diagonalSpeedFactor;
-            this.player.container.y += s;
+            this.player.tank.container.y += s;
         }else{
             this.keys.down = false;
         }
-        if(this.keys.left && this.player.container.x > this.player.container.width/2){
-            this.player.container.x -= s;
+        if(this.keys.left && this.player.tank.container.x > this.player.tank.container.width/2){
+            this.player.tank.container.x -= s;
         }else{
             this.keys.left = false;
         }
-        if(this.keys.right && this.player.container.x < this.player.game.width - this.player.container.width/2){
-            this.player.container.x += s;
+        if(this.keys.right && this.player.tank.container.x < this.player.game.width - this.player.tank.container.width/2){
+            this.player.tank.container.x += s;
         }else{
             this.keys.right = false;
         }
 
         if(this.keys.up && this.keys.left || this.keys.down && this.keys.right){
-            this.player.tank.rotation = this.rotation.diagonal2;
+            this.player.tank.base.rotation = this.rotation.diagonal2;
         }else if(this.keys.up && this.keys.right || this.keys.down && this.keys.left){
-            this.player.tank.rotation = this.rotation.diagonal1;
+            this.player.tank.base.rotation = this.rotation.diagonal1;
         }else if(this.keys.up || this.keys.down){
-            this.player.tank.rotation = this.rotation.vertical;
+            this.player.tank.base.rotation = this.rotation.vertical;
         }else if(this.keys.left || this.keys.right){
-            this.player.tank.rotation = this.rotation.horizontal;
+            this.player.tank.base.rotation = this.rotation.horizontal;
         }
 
         var mouseposition = this.player.game.app.renderer.plugins.interaction.mouse.global;
@@ -92,18 +92,18 @@ export class InputController {
         if(this.keys.mousedown && this.shotCooldownCrtl <= 0){
             this.shotCooldownCrtl = this.shotCooldown;
             let distance = this.player.game.config.tankSize * 1.1 / 2
-            let rot = this.player.gun.rotation;
-            let x = this.player.container.x + Math.sin(rot) * distance;
-            let y = this.player.container.y - Math.cos(rot) * distance;;
-            this.player.game.field.shot(x, y, rot)
+            let rot = this.player.tank.gun.rotation;
+            let x = this.player.tank.container.x + Math.sin(rot) * distance;
+            let y = this.player.tank.container.y - Math.cos(rot) * distance;           
+            this.player.game.field.connection.sendBullet(x, y, rot);
         }
         this.shotCooldownCrtl -= delta;
     }
 
     gunTrack(pos) {
-        let dx = pos.x - this.player.container.x;
-        let dy = pos.y - this.player.container.y;
+        let dx = pos.x - this.player.tank.container.x;
+        let dy = pos.y - this.player.tank.container.y;
         let d =  dx >= 0 ? 1 : -1;  
-        this.player.gun.rotation = Math.atan(dy/dx) + (Math.PI * d / 2);      
+        this.player.tank.gun.rotation = Math.atan(dy/dx) + (Math.PI * d / 2);      
     }
 }

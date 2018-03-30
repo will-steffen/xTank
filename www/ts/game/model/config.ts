@@ -6,7 +6,7 @@ export class Config {
     bulletSize: number;
     wsPort: number;
 
-    fromServer(data) {
+    fromServer(data): Config {
         let c = JSON.parse(data);
         this.wsPort = c.wsPort;
         this.width = c.width;
@@ -17,7 +17,7 @@ export class Config {
         return this;
     }
 
-    local() {
+    local(): Config  {
         this.wsPort = 8081;
         this.width = 900;
         this.height = 600;

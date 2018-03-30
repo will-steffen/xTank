@@ -3,6 +3,7 @@ import { WsReceive } from '../../model/ws-receive';
 import { WsSend } from '../../model/ws-send';
 import { Bullet } from '../../model/bullet';
 import { BroadcastType } from '../../model/enums';
+import { PlayerState } from '../../model/player-state';
 
 export class ConnectionController {
     ws: WebSocket;
@@ -26,11 +27,10 @@ export class ConnectionController {
 
     onMessage(evt) {
         let received = new WsReceive().fromServer(evt.data);
-        if(received.broadcastType == BroadcastType.Open){
+        if(received.type == BroadcastType.Open){
             this.serverId = received.id;
-        }else{
-            console.log(received.bullet);
-            this.field.renderer.shot(received.bullet.x, received.bullet.y);
+        }else if(received.type == BroadcastType.Update){
+            this.field.renderer.setState(received.gameState);
         }
     }
 
@@ -38,13 +38,15 @@ export class ConnectionController {
 
     }
 
-    send(txt: string) {
-        this.ws.send(JSON.stringify({message: txt}));
+    sendBullet(x: number, y: number, angle: number) {
+        let send = new WsSend(BroadcastType.Bullet, this.serverId);
+        send.bullet = new Bullet().send(x, y, angle, this.serverId);    
+        this.ws.send(send.json());
     }
 
-    sendBullet(x: number, y: number) {
-        let send = new WsSend();
-        send.bullet = new Bullet(x, y);
+    sendPlayerState(x: number, y: number, rotation: number, gunRotation: number) {
+        let send = new WsSend(BroadcastType.Update, this.serverId);
+        send.player = new PlayerState().send(x, y, rotation, gunRotation, this.serverId);
         this.ws.send(send.json());
     }
 }

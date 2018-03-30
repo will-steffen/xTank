@@ -1,18 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"time"
 
 	"golang.org/x/net/websocket"
 )
 
+// ------- CONNECTION -------
 var players = make([]*Player, 0)
 
 func onWsConnect(wsConn *websocket.Conn) {
 	defer wsConn.Close()
 	player := Player{
-		id:         len(players),
+		ID:         len(players),
 		connection: wsConn,
 	}
 	addPlayer(&player)
@@ -22,7 +23,7 @@ func addPlayer(p *Player) {
 	players = append(players, p)
 	websocket.JSON.Send(p.connection, Broadcast{
 		BroadcastType: broadcastTypeOpen,
-		ID:            p.id,
+		ID:            p.ID,
 	})
 	p.listen()
 }
@@ -34,39 +35,60 @@ func (p *Player) listen() {
 			log.Println(err)
 			break
 		}
-
-		b := Broadcast{
-			BroadcastType: broadcastTypeUpdate,
-			Message:       u.Message,
-			Bullet:        u.Bullet,
+		if u.BroadcastType == broadcastTypeBullet {
+			updateBullet(&u)
 		}
-		broadcast(b)
+		if u.BroadcastType == broadcastTypeUpdate {
+			updatePlayer(&u)
+		}
 	}
 }
 
-func broadcast(b Broadcast) {
+func broadcast(b *Broadcast) {
 	for _, p := range players {
 		websocket.JSON.Send(p.connection, b)
 	}
 }
 
-func onWsConnect2(ws *websocket.Conn) {
-	for {
-		// allocate our container struct
-		var m message
+// ------- GAME STATE -------
+var gameState = GameState{
+	Players: make([]*PlayerState, 0),
+	Bullets: make([]*Bullet, 0),
+}
+var lastUpdate = time.Now().UnixNano()
 
-		// receive a message using the codec
-		if err := websocket.JSON.Receive(ws, &m); err != nil {
-			log.Println(err)
-		}
+func updateBullet(u *Update) {
+	gameState.Bullets = append(gameState.Bullets, u.Bullet)
+	calcState()
+}
 
-		fmt.Println("Received message:", m.Message+": ")
-
-		// send a response
-		m2 := message{"Thanks for the message!"}
-		if err := websocket.JSON.Send(ws, m2); err != nil {
-			log.Println(err)
-			break
+func updatePlayer(u *Update) {
+	var p *PlayerState
+	for _, player := range gameState.Players {
+		if player.ID == u.PlayerID {
+			p = player
 		}
 	}
+	if p == nil {
+		p = u.PlayerState
+		gameState.Players = append(gameState.Players, p)
+	} else {
+		p.X = u.PlayerState.X
+		p.Y = u.PlayerState.Y
+		p.Rotation = u.PlayerState.Rotation
+		p.GunRotation = u.PlayerState.GunRotation
+	}
+	calcState()
+}
+
+func sendState() {
+	b := Broadcast{
+		BroadcastType: broadcastTypeUpdate,
+		GameState:     &gameState,
+	}
+	broadcast(&b)
+}
+
+func calcState() {
+	sendState()
 }

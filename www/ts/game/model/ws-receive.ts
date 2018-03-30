@@ -1,18 +1,16 @@
 import { BroadcastType } from './enums';
-import { Bullet } from './bullet';
+import { GameState } from './game-state';
 
 export class WsReceive {
-    broadcastType: BroadcastType;
+    type: BroadcastType;
     id: number;
-    message: string;
-    bullet: Bullet;
+    gameState: GameState;
 
-    fromServer(data) {
+    fromServer(data): WsReceive {
         let s = JSON.parse(data);
-        this.broadcastType = s.type;
+        this.type = s.type;
         this.id = s.id;
-        this.message = s.message;
-        this.bullet = s.bullet;
+        this.gameState = s.gameState;   
         return this;
     }
 }
