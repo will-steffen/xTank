@@ -10,12 +10,12 @@ import (
 // ------- CONNECTION -------
 var players = make([]*Player, 0)
 
-func onWsConnect(wsConn *websocket.Conn) {
-	defer wsConn.Close()
+func onWsConnect(ws *websocket.Conn) {
 	player := Player{
 		ID:         len(players),
-		connection: wsConn,
+		connection: ws,
 	}
+	defer removePlayer(&player)
 	addPlayer(&player)
 }
 
@@ -26,6 +26,11 @@ func addPlayer(p *Player) {
 		ID:            p.ID,
 	})
 	p.listen()
+}
+
+func removePlayer(p *Player) {
+	removePlayerState(p.ID)
+	p.connection.Close()
 }
 
 func (p *Player) listen() {
@@ -79,6 +84,16 @@ func updatePlayer(u *Update) {
 		p.GunRotation = u.PlayerState.GunRotation
 	}
 	calcState()
+}
+
+func removePlayerState(ID int) {
+	nGS := make([]*PlayerState, 0)
+	for _, player := range gameState.Players {
+		if player.ID != ID {
+			nGS = append(nGS, player)
+		}
+	}
+	gameState.Players = nGS
 }
 
 func sendState() {

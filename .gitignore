@@ -10,5 +10,7 @@
 # game build output
 /www/game.js
 
-# go debug
+# go buils
 debug
+main.exe
+xTank.exe
