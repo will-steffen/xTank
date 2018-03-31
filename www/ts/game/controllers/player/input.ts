@@ -12,8 +12,7 @@ export class InputController {
         diagonal1: Math.PI / 4,
         diagonal2: - Math.PI / 4,
     };
-    pointer: PIXI.Sprite; 
-    shotCooldown = 10;   
+    pointer: PIXI.Sprite;   
     shotCooldownCrtl = 0;
     diagonalSpeedFactor = 1 / 1.414213;
 
@@ -90,7 +89,7 @@ export class InputController {
         this.pointer.y = mouseposition.y;
         this.gunTrack(mouseposition);
         if(this.keys.mousedown && this.shotCooldownCrtl <= 0){
-            this.shotCooldownCrtl = this.shotCooldown;
+            this.shotCooldownCrtl = this.player.game.config.shotCooldown;
             let distance = this.player.game.config.tankSize * 1.1 / 2
             let rot = this.player.tank.gun.rotation;
             let x = this.player.tank.container.x + Math.sin(rot) * distance;

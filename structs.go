@@ -12,14 +12,14 @@ const (
 
 // Player defines connection information
 type Player struct {
-	ID         int `json:"id"`
+	ID         int64 `json:"id"`
 	connection *websocket.Conn
 }
 
 // Update ...
 type Update struct {
 	BroadcastType int          `json:"type"`
-	PlayerID      int          `json:"playerId"`
+	PlayerID      int64        `json:"playerId"`
 	Bullet        *Bullet      `json:"bullet"`
 	PlayerState   *PlayerState `json:"player"`
 }
@@ -27,7 +27,7 @@ type Update struct {
 // Broadcast ...
 type Broadcast struct {
 	BroadcastType int        `json:"type"`
-	ID            int        `json:"id"`
+	ID            int64      `json:"id"`
 	GameState     *GameState `json:"gameState"`
 }
 
@@ -41,18 +41,18 @@ type GameState struct {
 
 // PlayerState defines information of tank
 type PlayerState struct {
-	ID          int     `json:"id"`
-	X           float32 `json:"x"`
-	Y           float32 `json:"y"`
-	Rotation    float32 `json:"rotation"`
-	GunRotation float32 `json:"gunRotation"`
+	ID          int64   `json:"id"`
+	X           float64 `json:"x"`
+	Y           float64 `json:"y"`
+	Rotation    float64 `json:"rotation"`
+	GunRotation float64 `json:"gunRotation"`
 }
 
 // Bullet ...
 type Bullet struct {
-	ID       int     `json:"id"`
-	PlayerID int     `json:"playerId"`
-	X        float32 `json:"x"`
-	Y        float32 `json:"y"`
-	Angle    float32 `json:"angle"`
+	ID       int64   `json:"id"`
+	PlayerID int64   `json:"playerId"`
+	X        float64 `json:"x"`
+	Y        float64 `json:"y"`
+	Angle    float64 `json:"angle"`
 }

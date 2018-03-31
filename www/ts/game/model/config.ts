@@ -5,6 +5,7 @@ export class Config {
     tankSize: number;
     bulletSize: number;
     wsPort: number;
+    shotCooldown: number;
 
     fromServer(data): Config {
         let c = JSON.parse(data);
@@ -14,6 +15,7 @@ export class Config {
         this.tankSize = c.tankSize;
         this.tankSpeed = c.tankSpeed;
         this.bulletSize = c.bulletSize;
+        this.shotCooldown = c.shotCooldown;
         return this;
     }
 
@@ -24,6 +26,7 @@ export class Config {
         this.tankSize = 70;
         this.tankSpeed = 3;
         this.bulletSize = 4;
+        this.bulletSize = 30;
         return this;
     }
 }

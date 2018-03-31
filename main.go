@@ -24,5 +24,6 @@ func startHTTP(port string) {
 func startWS(port string) {
 	http.Handle("/socket", websocket.Handler(onWsConnect))
 	fmt.Println("Starting WS on" + port)
+	go broadcastService()
 	log.Fatal(http.ListenAndServe(port, nil))
 }

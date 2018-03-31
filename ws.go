@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math"
 	"time"
 
 	"golang.org/x/net/websocket"
@@ -12,7 +13,7 @@ var players = make([]*Player, 0)
 
 func onWsConnect(ws *websocket.Conn) {
 	player := Player{
-		ID:         len(players),
+		ID:         time.Now().UnixNano(),
 		connection: ws,
 	}
 	defer removePlayer(&player)
@@ -30,7 +31,18 @@ func addPlayer(p *Player) {
 
 func removePlayer(p *Player) {
 	removePlayerState(p.ID)
+	removePlayerConnection(p.ID)
 	p.connection.Close()
+}
+
+func removePlayerConnection(ID int64) {
+	nGS := make([]*Player, 0)
+	for _, player := range players {
+		if player.ID != ID {
+			nGS = append(nGS, player)
+		}
+	}
+	players = nGS
 }
 
 func (p *Player) listen() {
@@ -55,14 +67,21 @@ func broadcast(b *Broadcast) {
 	}
 }
 
+const (
+	gameWidth  = 900
+	gameHeight = 600
+)
+
 // ------- GAME STATE -------
 var gameState = GameState{
 	Players: make([]*PlayerState, 0),
 	Bullets: make([]*Bullet, 0),
 }
 var lastUpdate = time.Now().UnixNano()
+var delta int64
 
 func updateBullet(u *Update) {
+	u.Bullet.ID = time.Now().UnixNano()
 	gameState.Bullets = append(gameState.Bullets, u.Bullet)
 	calcState()
 }
@@ -86,7 +105,7 @@ func updatePlayer(u *Update) {
 	calcState()
 }
 
-func removePlayerState(ID int) {
+func removePlayerState(ID int64) {
 	nGS := make([]*PlayerState, 0)
 	for _, player := range gameState.Players {
 		if player.ID != ID {
@@ -105,5 +124,31 @@ func sendState() {
 }
 
 func calcState() {
-	sendState()
+	setDelta()
+	distance := float64(delta / 2000000)
+	nGS := make([]*Bullet, 0)
+	for _, bullet := range gameState.Bullets {
+		bullet.X += distance * math.Cos(bullet.Angle-math.Pi/2)
+		bullet.Y += distance * math.Sin(bullet.Angle-math.Pi/2)
+		if bullet.X > gameWidth || bullet.X < 0 || bullet.Y > gameHeight || bullet.Y < 0 {
+
+		} else {
+			nGS = append(nGS, bullet)
+		}
+	}
+	gameState.Bullets = nGS
+}
+
+func setDelta() {
+	now := time.Now().UnixNano()
+	delta = now - lastUpdate
+	lastUpdate = now
+}
+
+func broadcastService() {
+	ticker := time.NewTicker(10 * time.Millisecond)
+	for range ticker.C {
+		sendState()
+	}
+	ticker.Stop()
 }
