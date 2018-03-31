@@ -8,6 +8,7 @@ export class RendererController {
     tanksPool: Tank[] = [];
     tanksScreen: Tank[] = [];
     state: GameState;
+    render: boolean = true;
 
     constructor(private field: FieldController) {} 
 
@@ -16,34 +17,34 @@ export class RendererController {
     }
 
     update(delta: number) {
-        if(!this.state) return;
-        this.updateTanks();
-        this.updateBullets();
-        
+        this.resetTanks();
+        this.resetBullets();
+        if(this.state && this.render){
+            this.updateTanks();
+            this.updateBullets();
+        }
+        this.cleanTanks();
+        this.cleanBullets();
     }
 
     updateTanks() {
-        this.resetTanks();
         this.state.players.forEach(player => {
-            if(player.id != this.field.connection.serverId){
+            if(player.id != this.field.connection.serverId && !player.dead){
                 let tank = this.getTank();
                 tank.container.x = player.x;
                 tank.container.y = player.y;
                 tank.base.rotation = player.rotation;
                 tank.gun.rotation = player.gunRotation;
             }
-        });
-        this.cleanTanks();
+        });        
     }
 
-    updateBullets() {
-        this.resetBullets();
+    updateBullets() {        
         this.state.bullets.forEach(bullet => {
             let b = this.getBullet();
             b.x = bullet.x;
             b.y = bullet.y;         
-        });
-        this.cleanBullets();
+        });        
     }
 
     resetBullets() {

@@ -16,13 +16,22 @@ export class ConnectionController {
         this.ws.onopen = ev => { this.onOpen(ev) };
         this.ws.onclose= ev => { this.onClose(ev) };
         this.ws.onmessage = ev => { this.onMessage(ev) };
-        this.ws.onerror = ev => { this.onError(ev) };
+        this.ws.onerror = ev => { this.onError(ev) };         
+    }
+    close() {
+        this.ws.close();
     }
 
-    onOpen(evt) {}
+    onOpen(evt) {
+        this.field.game.message('Server Online');
+    }
 
     onClose(evt) {
-        console.log('OffLine =[');
+        this.field.game.message('Server Offline -> Trying to Reconnect');
+        this.field.renderer.setState(null);
+         setTimeout(() => {
+             this.create(); 
+        }, 1000);
     }
 
     onMessage(evt) {
@@ -31,6 +40,8 @@ export class ConnectionController {
             this.serverId = received.id;
         }else if(received.type == BroadcastType.Update){
             this.field.renderer.setState(received.gameState);
+        }else if(received.type == BroadcastType.Hit){
+            this.field.hit(received.hit);
         }
     }
 
@@ -46,10 +57,10 @@ export class ConnectionController {
         }
     }
 
-    sendPlayerState(x: number, y: number, rotation: number, gunRotation: number) {
+    sendPlayerState(x: number, y: number, rotation: number, gunRotation: number, dead: boolean) {
         if(this.isConnected()){
             let send = new WsSend(BroadcastType.Update, this.serverId);
-            send.player = new PlayerState().send(x, y, rotation, gunRotation, this.serverId);
+            send.player = new PlayerState().send(this.serverId, x, y, rotation, gunRotation, dead);
             this.ws.send(send.json());
         }
     }

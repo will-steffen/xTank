@@ -11,7 +11,7 @@ export class Game {
     height: number;
     width: number;
     config: Config;
-
+    text:  PIXI.Text;
     assets: Assets;  
 
     constructor() { 
@@ -48,7 +48,7 @@ export class Game {
         this.field.create();
         this.player.create();
         this.app.ticker.add(delta => this.update(delta));
-        //this.addFPS();
+        this.addFPS();
     }
 
     update(delta) {
@@ -56,24 +56,26 @@ export class Game {
         this.player.update(delta);
     }
 
+    message(txt: string) {
+        if(this.text)
+            this.text.text = txt;
+    }
+
     private addFPS() {
-        let fps: any;
         let mFps = 60;
-        fps = document.createElement('div');
-        fps.style.position = 'absolute';
-        fps.innerHTML = '';
-        fps.style.color = 'white';
-        fps.style.top = '0';
-        fps.style.fontSize = '30px';
-        document.body.appendChild(fps);         
-        this.app.ticker.add(delta => {
-            let fp = Math.round(60 / delta);
-            if(fp < mFps) {
-                mFps = fp;
-                setTimeout(() => { mFps = 60 }, 3000);
-            }
-            fps.innerHTML = fp + ' - ' + mFps
-        }); 
+        this.text = new PIXI.Text('', {
+            fill: 'white',
+            fontSize: 30
+        });      
+        this.app.stage.addChild(this.text);
+        // this.app.ticker.add(delta => {
+        //     let fp = Math.round(60 / delta);
+        //     if(fp < mFps) {
+        //         mFps = fp;
+        //         setTimeout(() => { mFps = 60 }, 3000);
+        //     }
+        //     this.text.text = fp + ' - ' + mFps
+        // }); 
     }
     
     private loadConfig(): Promise<void> {

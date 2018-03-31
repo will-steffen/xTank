@@ -6,6 +6,7 @@ const (
 	broadcastTypeOpen   = 1
 	broadcastTypeUpdate = 2
 	broadcastTypeBullet = 3
+	broadcastTypeHit    = 4
 )
 
 // ------- CONNECTION -------
@@ -29,6 +30,7 @@ type Broadcast struct {
 	BroadcastType int        `json:"type"`
 	ID            int64      `json:"id"`
 	GameState     *GameState `json:"gameState"`
+	Hit           *Hit       `json:"hit"`
 }
 
 // ------- GAME STATE -------
@@ -46,6 +48,7 @@ type PlayerState struct {
 	Y           float64 `json:"y"`
 	Rotation    float64 `json:"rotation"`
 	GunRotation float64 `json:"gunRotation"`
+	Dead        bool    `json:"dead"`
 }
 
 // Bullet ...
@@ -55,4 +58,11 @@ type Bullet struct {
 	X        float64 `json:"x"`
 	Y        float64 `json:"y"`
 	Angle    float64 `json:"angle"`
+}
+
+// Hit ...
+type Hit struct {
+	ID       int64 `json:"id"`
+	TargetID int64 `json:"targetId"`
+	KillerID int64 `json:"killerId"`
 }

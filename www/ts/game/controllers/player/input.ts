@@ -88,7 +88,7 @@ export class InputController {
         this.pointer.x = mouseposition.x;
         this.pointer.y = mouseposition.y;
         this.gunTrack(mouseposition);
-        if(this.keys.mousedown && this.shotCooldownCrtl <= 0){
+        if(this.keys.mousedown && this.shotCooldownCrtl <= 0 && !this.player.dead){
             this.shotCooldownCrtl = this.player.game.config.shotCooldown;
             let distance = this.player.game.config.tankSize * 1.1 / 2
             let rot = this.player.tank.gun.rotation;

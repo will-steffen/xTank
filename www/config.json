@@ -5,5 +5,5 @@
     "tankSpeed": 3,
     "tankSize": 70,
     "bulletSize": 4,
-    "shotCooldown": 2
+    "shotCooldown": 20
 }

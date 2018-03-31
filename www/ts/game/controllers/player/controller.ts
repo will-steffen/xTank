@@ -4,6 +4,7 @@ import { Tank } from '../../model/tank';
 
 export class PlayerController { 
     tank: Tank;  
+    dead: boolean = false;
     private input: InputController;
 
     constructor(public game: Game) {
@@ -19,6 +20,5 @@ export class PlayerController {
     update(delta: number) {
         this.input.update(delta);
     }
-
     
 }

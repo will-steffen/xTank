@@ -75,6 +75,7 @@ func broadcast(b *Broadcast) {
 const (
 	gameWidth  = 900
 	gameHeight = 600
+	tankSize   = 70
 )
 
 // ------- GAME STATE -------
@@ -107,6 +108,7 @@ func updatePlayer(u *Update) {
 		p.Y = u.PlayerState.Y
 		p.Rotation = u.PlayerState.Rotation
 		p.GunRotation = u.PlayerState.GunRotation
+		p.Dead = u.PlayerState.Dead
 	}
 	calcState()
 }
@@ -131,30 +133,49 @@ func sendState() {
 
 func calcState() {
 	setDelta()
-	calcBullets()
-	calcHits()
-	if sendStateControl {
-		sendStateControl = false
-		sendState()
-	}
-
-}
-func calcBullets() {
 	distance := float64(delta / 2000000)
 	nGS := make([]*Bullet, 0)
 	for _, bullet := range gameState.Bullets {
 		bullet.X += distance * math.Cos(bullet.Angle-math.Pi/2)
 		bullet.Y += distance * math.Sin(bullet.Angle-math.Pi/2)
 		if bullet.X > gameWidth || bullet.X < 0 || bullet.Y > gameHeight || bullet.Y < 0 {
-
-		} else {
+			//Do nothing, it will not be part of state
+		} else if !calcHit(bullet) {
 			nGS = append(nGS, bullet)
 		}
 	}
 	gameState.Bullets = nGS
-}
-func calcHits() {
+	if sendStateControl {
+		sendStateControl = false
+		sendState()
+	}
 
+}
+
+func calcHit(bullet *Bullet) bool {
+	rangeDistance := float64(tankSize/2) - 5
+	for _, player := range gameState.Players {
+		if player.ID == bullet.PlayerID || player.Dead || bullet.X < player.X-rangeDistance ||
+			bullet.X > player.X+rangeDistance || bullet.Y < player.Y-rangeDistance || bullet.Y > player.Y+rangeDistance {
+
+		} else {
+			sendHit(player, bullet.PlayerID)
+			return true
+		}
+	}
+	return false
+}
+
+func sendHit(player *PlayerState, bulletOwnerID int64) {
+	b := Broadcast{
+		BroadcastType: broadcastTypeHit,
+		Hit: &Hit{
+			ID:       time.Now().UnixNano(),
+			TargetID: player.ID,
+			KillerID: bulletOwnerID,
+		},
+	}
+	broadcast(&b)
 }
 
 func setDelta() {
@@ -164,7 +185,7 @@ func setDelta() {
 }
 
 func broadcastService() {
-	ticker := time.NewTicker(10 * time.Millisecond)
+	ticker := time.NewTicker(15 * time.Millisecond)
 	for range ticker.C {
 		sendStateControl = true
 	}
