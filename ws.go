@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"time"
@@ -63,7 +64,11 @@ func (p *Player) listen() {
 
 func broadcast(b *Broadcast) {
 	for _, p := range players {
-		websocket.JSON.Send(p.connection, b)
+		if p.connection.IsServerConn() {
+			if err := websocket.JSON.Send(p.connection, b); err != nil {
+				fmt.Println(err.Error())
+			}
+		}
 	}
 }
 
@@ -78,6 +83,7 @@ var gameState = GameState{
 	Bullets: make([]*Bullet, 0),
 }
 var lastUpdate = time.Now().UnixNano()
+var sendStateControl = false
 var delta int64
 
 func updateBullet(u *Update) {
@@ -125,6 +131,15 @@ func sendState() {
 
 func calcState() {
 	setDelta()
+	calcBullets()
+	calcHits()
+	if sendStateControl {
+		sendStateControl = false
+		sendState()
+	}
+
+}
+func calcBullets() {
 	distance := float64(delta / 2000000)
 	nGS := make([]*Bullet, 0)
 	for _, bullet := range gameState.Bullets {
@@ -138,6 +153,9 @@ func calcState() {
 	}
 	gameState.Bullets = nGS
 }
+func calcHits() {
+
+}
 
 func setDelta() {
 	now := time.Now().UnixNano()
@@ -148,7 +166,7 @@ func setDelta() {
 func broadcastService() {
 	ticker := time.NewTicker(10 * time.Millisecond)
 	for range ticker.C {
-		sendState()
+		sendStateControl = true
 	}
 	ticker.Stop()
 }
