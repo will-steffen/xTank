@@ -1,5 +1,6 @@
-import { FieldController } from './controllers/field/controller';
-import { PlayerController } from './controllers/player/controller';
+import { FieldController } from './controllers/field-controller';
+import { PlayerController } from './controllers/player-controller';
+import { ConnectionController } from './controllers/connection-controller';
 import { AssetElement } from './model/base';
 import { Config } from './model/config';
 import { Assets } from './def/assets';
@@ -8,6 +9,7 @@ export class Game {
     app: PIXI.Application;
     field: FieldController;
     player: PlayerController;
+    connection: ConnectionController;
     height: number;
     width: number;
     config: Config;
@@ -20,6 +22,7 @@ export class Game {
             this.app = new PIXI.Application({ width: this.config.width, height: this.config.height });
             this.field = new FieldController(this);
             this.player = new PlayerController(this);
+            this.connection = new ConnectionController(this);
             this.height = this.app.view.height;
             this.width = this.app.view.width;
             this.app.view.style.marginTop = 'calc(50vh - ' + (this.config.height/2) + 'px)';

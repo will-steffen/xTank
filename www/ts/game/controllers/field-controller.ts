@@ -1,8 +1,11 @@
-import { FieldController } from './controller';
-import { GameState } from '../../model/game-state';
-import { Tank } from '../../model/tank';
+import { Game } from '../game';
+import { GameState } from '../model/game-state';
+import { Hit } from '../model/hit';
+import { Tank } from '../model/tank';
 
-export class RendererController {
+export class FieldController {    
+    killCount = 0;
+
     bulletsPool: PIXI.Sprite[] = [];
     bulletsScreen: PIXI.Sprite[] = [];
     tanksPool: Tank[] = [];
@@ -10,13 +13,24 @@ export class RendererController {
     state: GameState;
     render: boolean = true;
 
-    constructor(private field: FieldController) {} 
+    constructor(public game: Game) { }
 
     setState(state: GameState) {
         this.state = state;
     }
 
+    create() {
+        this.game.connection.create();
+    }
+
     update(delta: number) {
+        this.game.connection.sendPlayerState(
+            this.game.player.tank.container.x,
+            this.game.player.tank.container.y,
+            this.game.player.tank.base.rotation,
+            this.game.player.tank.gun.rotation,
+            this.game.player.dead
+        );
         this.resetTanks();
         this.resetBullets();
         if(this.state && this.render){
@@ -29,7 +43,7 @@ export class RendererController {
 
     updateTanks() {
         this.state.players.forEach(player => {
-            if(player.id != this.field.connection.serverId && !player.dead){
+            if(player.id != this.game.connection.serverId && !player.dead){
                 let tank = this.getTank();
                 tank.container.x = player.x;
                 tank.container.y = player.y;
@@ -65,14 +79,14 @@ export class RendererController {
             bullet = this.bulletsPool[0];
             this.bulletsPool.splice(0, 1);
         }else{
-            bullet = new PIXI.Sprite(PIXI.loader.resources[this.field.game.assets.bullet.path].texture);
-            bullet.width = this.field.game.config.bulletSize;
-            bullet.height = this.field.game.config.bulletSize;
+            bullet = new PIXI.Sprite(PIXI.loader.resources[this.game.assets.bullet.path].texture);
+            bullet.width = this.game.config.bulletSize;
+            bullet.height = this.game.config.bulletSize;
             bullet.anchor.x = 0.5;
             bullet.anchor.y = 0.5;
             bullet.x = -100;
             bullet.y = -100;
-            this.field.game.app.stage.addChild(bullet);
+            this.game.app.stage.addChild(bullet);
         }
         this.bulletsScreen.push(bullet);
         return bullet;
@@ -96,10 +110,26 @@ export class RendererController {
             tank = this.tanksPool[0];
             this.tanksPool.splice(0, 1);
         }else{
-            tank = new Tank(this.field.game);
+            tank = new Tank(this.game);
         }
         this.tanksScreen.push(tank);
         return tank;
     }
 
+    hit(hit: Hit) {
+        if(hit.targetId == this.game.connection.serverId){            
+            this.game.message('YOU DIED');
+            this.game.player.dead = true;  
+            this.render = false;
+            this.killCount = 0;
+            setTimeout(() => {
+                this.game.message('');
+                this.game.player.dead = false;
+                this.render = true;
+            },3000);            
+        }else if(hit.killerId == this.game.connection.serverId){
+            this.killCount++;
+            this.game.message('['+this.killCount+']');     
+        }
+    }
 }

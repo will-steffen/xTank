@@ -1,8 +1,9 @@
-import { PlayerController } from './controller';
+import { Game } from '../game';
+import { Tank } from '../model/tank';
 
-export class InputController {  
-    constructor(private player: PlayerController) {} 
-
+export class PlayerController { 
+    tank: Tank;  
+    dead: boolean = false;
     keysCode = { up: 87, down: 83, left: 65, right: 68 };
     keysArrowCode = { up: 38, down: 40, left: 37, right: 39 };
     keys = { up: false, down: false, left: false, right: false, mousedown: false };
@@ -16,7 +17,11 @@ export class InputController {
     shotCooldownCrtl = 0;
     diagonalSpeedFactor = 1 / 1.414213;
 
+    constructor(public game: Game) { }
+
     create() {
+        this.tank = new Tank(this.game);
+
         window.addEventListener('keydown', evt => {
             switch(evt.keyCode){
                 case this.keysCode.up:    this.keys.up    = true;break;
@@ -35,74 +40,74 @@ export class InputController {
         });
         window.addEventListener('mousedown', evt => { this.keys.mousedown = true });
         window.addEventListener('mouseup', evt => { this.keys.mousedown = false });
-        this.pointer = new PIXI.Sprite(PIXI.loader.resources[this.player.game.assets.pointer.path].texture);
+        this.pointer = new PIXI.Sprite(PIXI.loader.resources[this.game.assets.pointer.path].texture);
         this.pointer.x = -10;
         this.pointer.y = -10;
 
-        this.pointer.width = this.player.game.width / 150;
+        this.pointer.width = this.game.width / 150;
         this.pointer.height = this.pointer.width;
 
         this.pointer.anchor.x = 0.5;
         this.pointer.anchor.y = 0.5;
 
-
-        this.player.game.app.stage.addChild(this.pointer);
-    }
+        this.game.app.stage.addChild(this.pointer);        
+    }    
 
     update(delta: number) {
-        let s = this.player.game.config.tankSpeed * delta;
-        if(this.keys.up && this.player.tank.container.y > this.player.tank.container.height/2){            
+        let s = this.game.config.tankSpeed * delta;
+        if(this.keys.up && this.tank.container.y > this.tank.container.height/2){            
             if(this.keys.left || this.keys.right) s *= this.diagonalSpeedFactor;
-            this.player.tank.container.y -= s;
+            this.tank.container.y -= s;
         }else{
             this.keys.up = false;
         }
-        if(this.keys.down && this.player.tank.container.y < this.player.game.height - this.player.tank.container.height/2){
+        if(this.keys.down && this.tank.container.y < this.game.height - this.tank.container.height/2){
             if(this.keys.left || this.keys.right) s *= this.diagonalSpeedFactor;
-            this.player.tank.container.y += s;
+            this.tank.container.y += s;
         }else{
             this.keys.down = false;
         }
-        if(this.keys.left && this.player.tank.container.x > this.player.tank.container.width/2){
-            this.player.tank.container.x -= s;
+        if(this.keys.left && this.tank.container.x > this.tank.container.width/2){
+            this.tank.container.x -= s;
         }else{
             this.keys.left = false;
         }
-        if(this.keys.right && this.player.tank.container.x < this.player.game.width - this.player.tank.container.width/2){
-            this.player.tank.container.x += s;
+        if(this.keys.right && this.tank.container.x < this.game.width - this.tank.container.width/2){
+            this.tank.container.x += s;
         }else{
             this.keys.right = false;
         }
 
         if(this.keys.up && this.keys.left || this.keys.down && this.keys.right){
-            this.player.tank.base.rotation = this.rotation.diagonal2;
+            this.tank.base.rotation = this.rotation.diagonal2;
         }else if(this.keys.up && this.keys.right || this.keys.down && this.keys.left){
-            this.player.tank.base.rotation = this.rotation.diagonal1;
+            this.tank.base.rotation = this.rotation.diagonal1;
         }else if(this.keys.up || this.keys.down){
-            this.player.tank.base.rotation = this.rotation.vertical;
+            this.tank.base.rotation = this.rotation.vertical;
         }else if(this.keys.left || this.keys.right){
-            this.player.tank.base.rotation = this.rotation.horizontal;
+            this.tank.base.rotation = this.rotation.horizontal;
         }
 
-        var mouseposition = this.player.game.app.renderer.plugins.interaction.mouse.global;
+        var mouseposition = this.game.app.renderer.plugins.interaction.mouse.global;
         this.pointer.x = mouseposition.x;
         this.pointer.y = mouseposition.y;
         this.gunTrack(mouseposition);
-        if(this.keys.mousedown && this.shotCooldownCrtl <= 0 && !this.player.dead){
-            this.shotCooldownCrtl = this.player.game.config.shotCooldown;
-            let distance = this.player.game.config.tankSize * 1.1 / 2
-            let rot = this.player.tank.gun.rotation;
-            let x = this.player.tank.container.x + Math.sin(rot) * distance;
-            let y = this.player.tank.container.y - Math.cos(rot) * distance;           
-            this.player.game.field.connection.sendBullet(x, y, rot);
+        if(this.keys.mousedown && this.shotCooldownCrtl <= 0 && !this.dead){
+            this.shotCooldownCrtl = this.game.config.shotCooldown;
+            let distance = this.game.config.tankSize * 1.1 / 2
+            let rot = this.tank.gun.rotation;
+            let x = this.tank.container.x + Math.sin(rot) * distance;
+            let y = this.tank.container.y - Math.cos(rot) * distance;           
+            this.game.connection.sendBullet(x, y, rot);
         }
         this.shotCooldownCrtl -= delta;
     }
 
     gunTrack(pos) {
-        let dx = pos.x - this.player.tank.container.x;
-        let dy = pos.y - this.player.tank.container.y;
+        let dx = pos.x - this.tank.container.x;
+        let dy = pos.y - this.tank.container.y;
         let d =  dx >= 0 ? 1 : -1;  
-        this.player.tank.gun.rotation = Math.atan(dy/dx) + (Math.PI * d / 2);      
+        this.tank.gun.rotation = Math.atan(dy/dx) + (Math.PI * d / 2);      
     }
+    
 }

@@ -1,18 +1,18 @@
-import { FieldController } from './controller';
-import { WsReceive } from '../../model/ws-receive';
-import { WsSend } from '../../model/ws-send';
-import { Bullet } from '../../model/bullet';
-import { BroadcastType } from '../../model/enums';
-import { PlayerState } from '../../model/player-state';
+import { WsReceive } from '../model/ws-receive';
+import { WsSend } from '../model/ws-send';
+import { Bullet } from '../model/bullet';
+import { BroadcastType } from '../model/enums';
+import { PlayerState } from '../model/player-state';
+import { Game } from '../game';
 
 export class ConnectionController {
     ws: WebSocket;
     serverId: number;
 
-    constructor(private field: FieldController) {} 
+    constructor(public game: Game) { }
 
     create() {
-        this.ws = new WebSocket('ws://' + window.location.host + ':' + this.field.game.config.wsPort + '/socket');
+        this.ws = new WebSocket('ws://' + window.location.host + ':' + this.game.config.wsPort + '/socket');
         this.ws.onopen = ev => { this.onOpen(ev) };
         this.ws.onclose= ev => { this.onClose(ev) };
         this.ws.onmessage = ev => { this.onMessage(ev) };
@@ -23,12 +23,12 @@ export class ConnectionController {
     }
 
     onOpen(evt) {
-        this.field.game.message('Server Online');
+        this.game.message('Server Online');
     }
 
     onClose(evt) {
-        this.field.game.message('Server Offline -> Trying to Reconnect');
-        this.field.renderer.setState(null);
+        this.game.message('Server Offline -> Trying to Reconnect');
+        this.game.field.setState(null);
          setTimeout(() => {
              this.create(); 
         }, 1000);
@@ -39,9 +39,9 @@ export class ConnectionController {
         if(received.type == BroadcastType.Open){
             this.serverId = received.id;
         }else if(received.type == BroadcastType.Update){
-            this.field.renderer.setState(received.gameState);
+            this.game.field.setState(received.gameState);
         }else if(received.type == BroadcastType.Hit){
-            this.field.hit(received.hit);
+            this.game.field.hit(received.hit);
         }
     }
 
