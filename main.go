@@ -11,8 +11,9 @@ import (
 )
 
 func main() {
-	go startWS(":8080")
-	startHTTP(":80")
+	//go startWS(":8080")
+	//startHTTP(":80")
+	startWS(":80")
 }
 
 func startHTTP(port string) {
