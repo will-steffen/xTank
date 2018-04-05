@@ -4,11 +4,6 @@
 .vscode/*
 */.vscode/*
 
-# node_modules
-/www/node_modules/*
-
-# game build output
-/www/game.js
 
 # go buils
 debug
