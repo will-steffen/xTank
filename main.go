@@ -13,7 +13,8 @@ import (
 func main() {
 	//go startWS(":8080")
 	//startHTTP(":80")
-	startWS(":80")
+	port := os.Getenv("PORT")
+	startWS(":" + port)
 }
 
 func startHTTP(port string) {
